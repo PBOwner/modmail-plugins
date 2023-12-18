@@ -35,8 +35,8 @@ Make sure to set `REGISTRY_PLUGINS_ONLY` in your environment variables to `False
   <ul>
   <li><code>OAUTH2_CLIENT_ID</code> - The ID of your bot</li>
   <li><code>OAUTH2_CLIENT_SECRET</code> - Get this from the general information section of your bot app in the Discord dev portal</li>
-  <li><code>OAUTH2_REDIRECT_URI</code> - This will be equal to the URL of your log viewer app + <code>/callback</code> e.g. <code>https://logwebsite.com/callback</code>. You will need to add this same URL as a redirect URL in the OAuth2 section in the Discord dev portal.</li>
-  </ul> 
+  <li><code>OAUTH2_REDIRECT_URI</code> - This will be equal to the URL of your log viewer app + <code>/callback</code> e.g. <code>https://logwebsite.com/callback</code>. You will need to add this same URL as a redirect URL in the OAuth2 section in the Discord dev portal.<br></li>
+  </ul>Lastly, add users or roles to whitelist to access the logs with <code>?oauth whitelist @user/role</code>
   </td>
  </tr>
 
