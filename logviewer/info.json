@@ -1,13 +1,13 @@
 {
     "author": "modmail-dev, Jerrie-Aries, raidensakura",
-    "bot_version": "4.0.2",
+    "bot_version": "4.1.0",
     "description": [
         "Logviewer plugin.",
         "\nA simple web server to view Modmail logs.",
         "Also checkout the [wiki]({0}).",
         "\n**Version:**\n`{1}`"
     ],
-    "dpy_version": "2.2.3",
+    "dpy_version": "2.3.2",
     "name": "Logviewer",
     "requirements": [
         "Jinja2",
