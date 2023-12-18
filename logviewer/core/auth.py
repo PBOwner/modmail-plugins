@@ -31,7 +31,7 @@ def authentication(func):
 
         user = session.get("user")
 
-        whitelist = self.bot.config.get("oauth_whitelist", [])
+        whitelist = self.bot.config.get("oauth_whitelist")
 
         roles = await get_user_roles(user["id"])
 
