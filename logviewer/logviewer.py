@@ -6,12 +6,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
-from discord.utils import MISSING
-
 from core import checks
 from core.models import PermissionLevel, getLogger
 from core.utils import strtobool
+from discord.ext import commands
+from discord.utils import MISSING
 
 from .core.servers import LogviewerServer
 
@@ -24,9 +23,7 @@ with open(info_json, encoding="utf-8") as f:
 
 __plugin_name__ = __plugin_info__["name"]
 __version__ = __plugin_info__["version"]
-__description__ = "\n".join(__plugin_info__["description"]).format(
-    __plugin_info__["wiki"], __version__
-)
+__description__ = "\n".join(__plugin_info__["description"]).format(__plugin_info__["wiki"], __version__)
 
 logger = getLogger(__name__)
 

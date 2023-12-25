@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Callable
 
 from aiohttp import web
 from aiohttp.web import Response
-
 from core.models import getLogger
 
 from .auth import login, logout, oauth_callback
@@ -93,8 +92,6 @@ class AIOHTTPMethodHandler(web.View):
             return await server.render_template("index", self.request)
 
         if key:
-            return await server.process_logs(
-                self.request, path=self.request.path, key=key
-            )
+            return await server.process_logs(self.request, path=self.request.path, key=key)
 
         raise web.HTTPNotFound(reason=f"Invalid path, '{self.request.path}'.")

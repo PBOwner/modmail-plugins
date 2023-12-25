@@ -13,20 +13,18 @@ from aiohttp import web
 from aiohttp.web import Application, Request, Response, normalize_path_middleware
 from aiohttp_session import get_session, setup
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
+from core.models import getLogger
 from cryptography import fernet
 from discord.utils import MISSING
 from jinja2 import Environment, FileSystemLoader
-
-from core.models import getLogger
 
 from .auth import authentication
 from .handlers import AIOHTTPMethodHandler, aiohttp_error_handler
 from .models import LogEntry, LogList
 
 if TYPE_CHECKING:
-    from jinja2 import Template  # noqa: F401
-
     from bot import ModmailBot
+    from jinja2 import Template  # noqa: F401
 
     from .types_ext import RawPayload
 
@@ -165,22 +163,16 @@ class LogviewerServer:
 
         return main_deps
 
-    async def process_logs(
-        self, request: Request, *, path: str, key: str, **kwargs
-    ) -> Response:
+    async def process_logs(self, request: Request, *, path: str, key: str, **kwargs) -> Response:
         """
         Matches the request path with regex before rendering the logs template to user.
         """
 
-        prefix = (
-            "" if self.config.log_prefix == "/" else self.config.log_prefix or "/logs"
-        )
+        prefix = "" if self.config.log_prefix == "/" else self.config.log_prefix or "/logs"
         path_re = re.compile(rf"^{prefix}/(?:(?P<raw>raw)/)?(?P<key>([a-zA-Z]|[0-9])+)")
         match = path_re.match(path)
         if match is None:
-            return await self.raise_error(
-                "not_found", message=f"Invalid path, '{path}'."
-            )
+            return await self.raise_error("not_found", message=f"Invalid path, '{path}'.")
         data = match.groupdict()
         raw = data["raw"]
         if not raw:
@@ -199,13 +191,9 @@ class LogviewerServer:
         logs = self.bot.api.logs
         document: RawPayload = await logs.find_one({"key": key})
         if not document:
-            return await self.raise_error(
-                "not_found", message=f"Log entry '{key}' not found."
-            )
+            return await self.raise_error("not_found", message=f"Log entry '{key}' not found.")
         log_entry = LogEntry(document)
-        return await self.render_template(
-            "logbase", request, log_entry=log_entry, **kwargs
-        )
+        return await self.render_template("logbase", request, log_entry=log_entry, **kwargs)
 
     @authentication
     async def render_raw_logs(self, request, key, **kwargs) -> Any:
@@ -215,9 +203,7 @@ class LogviewerServer:
         logs = self.bot.api.logs
         document: RawPayload = await logs.find_one({"key": key})
         if not document:
-            return await self.raise_error(
-                "not_found", message=f"Log entry '{key}' not found."
-            )
+            return await self.raise_error("not_found", message=f"Log entry '{key}' not found.")
 
         log_entry = LogEntry(document)
         return Response(
@@ -297,9 +283,7 @@ class LogviewerServer:
         return await self.render_template("loglist", request, data=log_list, **kwargs)
 
     @staticmethod
-    async def raise_error(
-        error_type: str, *, message: Optional[str] = None, **kwargs
-    ) -> Any:
+    async def raise_error(error_type: str, *, message: Optional[str] = None, **kwargs) -> Any:
         exc_mapping = {
             "not_found": web.HTTPNotFound,
             "error": web.HTTPInternalServerError,
@@ -323,7 +307,6 @@ class LogviewerServer:
         *args: Any,
         **kwargs: Any,
     ) -> Response:
-
         session = await get_session(request)
         kwargs["session"] = session
         kwargs["user"] = session.get("user")

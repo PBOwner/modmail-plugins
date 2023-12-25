@@ -3,7 +3,6 @@ from urllib.parse import urlencode
 
 import aiohttp
 from aiohttp_session import get_session
-
 from core.models import getLogger
 
 logger = getLogger(__name__)
@@ -35,11 +34,7 @@ def authentication(func):
 
         roles = await get_user_roles(user["id"])
 
-        if (
-            int(user["id"]) in whitelist
-            or "everyone" in whitelist
-            or any(int(r) in whitelist for r in roles)
-        ):
+        if int(user["id"]) in whitelist or "everyone" in whitelist or any(int(r) in whitelist for r in roles):
             kwargs["using_oauth"] = True
             kwargs["session"] = session
             kwargs["user"] = user
@@ -95,7 +90,6 @@ async def fetch_token(code):
 
 
 async def login(request):
-
     session = await get_session(request)
     if not session.get("last_visit"):
         session["last_visit"] = "/"

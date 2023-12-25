@@ -4,9 +4,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, Union
 
 import dateutil.parser
-from natural.date import duration
-
 from core.models import getLogger
+from natural.date import duration
 
 from .formatter import format_content_html
 
@@ -44,9 +43,7 @@ class LogEntry:
         self.closer: Author = Author(data["closer"]) if not self.open else None
         self.close_message: str = format_content_html(data.get("close_message") or "")
         self.messages: List[Message] = [Message(m) for m in data["messages"]]
-        self.internal_messages: List[Message] = [
-            m for m in self.messages if m.type == "internal"
-        ]
+        self.internal_messages: List[Message] = [m for m in self.messages if m.type == "internal"]
         self.thread_messages: List[Message] = [
             m for m in self.messages if m.type not in ("internal", "system")
         ]
@@ -186,11 +183,7 @@ class Author:
         return f"https://cdn.discordapp.com/embed/avatars/{int(self.id) % 5}.png"
 
     def __str__(self) -> str:
-        return (
-            f"{self.name}"
-            if self.discriminator == "0"
-            else f"{self.name}#{self.discriminator}"
-        )
+        return f"{self.name}" if self.discriminator == "0" else f"{self.name}#{self.discriminator}"
 
     def __eq__(self, other: Author) -> bool:
         return self.id == other.id and self.mod is other.mod
@@ -237,9 +230,7 @@ class Message:
         self.human_created_at: str = duration(self.created_at, now=datetime.utcnow())
         self.raw_content: str = data["content"]
         self.content: str = self.format_html_content(self.raw_content)
-        self.attachments: List[Attachment] = [
-            Attachment(a) for a in data["attachments"]
-        ]
+        self.attachments: List[Attachment] = [Attachment(a) for a in data["attachments"]]
         self.author: Author = Author(data["author"])
         self.type: str = data.get("type", "thread_message")
         self.edited: bool = data.get("edited", False)
