@@ -50,7 +50,7 @@ Make sure to set `REGISTRY_PLUGINS_ONLY` in your environment variables to `False
 <p align="center">Make sure poetry is installed (I recommend using pipx).</p>
 
 ```py
-poetry install --only dev
+poetry install --no-root --only dev
 pre-commit install
 ```
 
