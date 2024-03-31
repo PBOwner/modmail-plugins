@@ -2,7 +2,7 @@ import os
 from urllib.parse import urlencode
 
 import aiohttp
-from aiohttp_session import get_session
+from aiohttp_session import get_session, new_session
 from core.models import getLogger
 
 logger = getLogger(__name__)
@@ -105,7 +105,7 @@ async def login(request):
 
 
 async def oauth_callback(request):
-    session = await get_session(request)
+    session = await new_session(request)
 
     code = request.query.get("code")
     token = await fetch_token(code)
