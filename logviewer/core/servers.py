@@ -106,9 +106,15 @@ class LogviewerServer:
         key = os.getenv("LOGVIEWER_SECRET", "A sophisticated key")[:24]
         key_b = key.encode("utf-8")
         key64 = base64.urlsafe_b64encode(key_b.ljust(32)[:32])
-        f = fernet.Fernet(key64)
+        secret_key = fernet.Fernet(key64)
 
-        setup(self.app, EncryptedCookieStorage(f))
+        # max_age = 3 days
+        setup(
+            self.app,
+            EncryptedCookieStorage(
+                secret_key, cookie_name="Logviewer session", max_age=86400, secure=True, samesite=True
+            ),
+        )
 
     def _add_routes(self) -> None:
         prefix = self.config.log_prefix or "/logs"

@@ -2,7 +2,7 @@ import os
 from urllib.parse import urlencode
 
 import aiohttp
-from aiohttp_session import get_session, new_session
+from aiohttp_session import get_session, log as aiohttp_session_logger
 from core.models import getLogger
 
 logger = getLogger(__name__)
@@ -15,6 +15,11 @@ API_BASE = "https://discordapp.com/api/"
 AUTHORIZATION_BASE_URL = f"{API_BASE}/oauth2/authorize"
 TOKEN_URL = f"{API_BASE}/oauth2/token"
 ROLE_URL = f"{API_BASE}/guilds/{{guild_id}}/members/{{user_id}}"
+
+for handler in aiohttp_session_logger.log.handlers[:]:
+    aiohttp_session_logger.log.removeHandler(handler)
+
+aiohttp_session_logger.log.addHandler(logger)
 
 
 def authentication(func):
@@ -105,7 +110,7 @@ async def login(request):
 
 
 async def oauth_callback(request):
-    session = await new_session(request)
+    session = await get_session(request)
 
     code = request.query.get("code")
     token = await fetch_token(code)
