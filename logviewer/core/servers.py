@@ -111,7 +111,7 @@ class LogviewerServer:
         # max_age = 3 days
         setup(
             self.app,
-            EncryptedCookieStorage(secret_key, max_age=86400, secure=True, samesite=True),
+            EncryptedCookieStorage(secret_key, max_age=86400, samesite=True),
         )
 
     def _add_routes(self) -> None:
