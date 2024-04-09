@@ -51,7 +51,7 @@ def authentication(func):
         result = await self.render_template(
             "unauthorized",
             request,
-            message="You are not authorized to view this thread.",
+            message="You are not whitelisted to view this thread.",
         )
         return result
 
