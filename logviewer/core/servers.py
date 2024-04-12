@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import os
 import re
+import ssl
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 from urllib.parse import urlparse
@@ -42,31 +43,35 @@ jinja_env = Environment(
     enable_async=True,
 )
 
-OAUTH2_CLIENT_ID = os.getenv("OAUTH2_CLIENT_ID")
-OAUTH2_CLIENT_SECRET = os.getenv("OAUTH2_CLIENT_SECRET")
-OAUTH2_REDIRECT_URI = os.getenv("OAUTH2_REDIRECT_URI")
-oauth_enabled = all((OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET, OAUTH2_REDIRECT_URI))
-
 
 class Config:
     """
     Base class for storing configurations from `.env` (environment variables).
     """
 
-    def __init__(self):
-        self.log_url = os.getenv("LOG_URL", "https://example.com")
-        self.log_prefix = os.getenv("LOG_URL_PREFIX", "/logs")
-        self.host = os.getenv("HOST", "0.0.0.0")
-        self.port = int(os.getenv("PORT", 8000))
-        self.pagination = os.getenv("LOGVIEWER_PAGINATION", 25)
+    def __init__(self, config: dict):
+        self.log_url = os.getenv("LOG_URL", "http://localhost:8000")
+        self.log_prefix = os.getenv("LOG_URL_PREFIX", config["log_url_prefix"])
+        self.host = os.getenv("HOST", config["host"])
+        self.port = int(os.getenv("PORT", config["port"]))
+        self.pagination = os.getenv("LOGVIEWER_PAGINATION", config["pagination"])
+        self.client_id = os.getenv("OAUTH2_CLIENT_ID", config["oauth2_client_id"])
+        self.client_secret = os.getenv("OAUTH2_CLIENT_SECRET", config["oauth2_client_secret"])
+        self.redirect_uri = os.getenv("OAUTH2_REDIRECT_URI", config["oauth2_redirect_uri"])
+        self.ssl_cert_path = os.getenv("SSL_CERT_PATH", config["ssl_cert_path"])
+        self.ssl_key_path = os.getenv("SSL_KEY_PATH", config["ssl_key_path"])
+        self.encryption_key = os.getenv("LOGVIEWER_SECRET", config["encryption_key"])[:24]
 
-        self.using_oauth = oauth_enabled
+        global REDIRECT_URI, CLIENT_ID, CLIENT_SECRET
+        REDIRECT_URI, CLIENT_ID, CLIENT_SECRET = self.redirect_uri, self.client_id, self.client_secret
+
+        self.using_oauth = all([self.client_id, self.client_secret, self.redirect_uri])
         if self.using_oauth:
             logger.info(f"Enabling Logviewer Oauth: {self.using_oauth}")
             self.guild_id = os.getenv("GUILD_ID")
             self.bot_token = os.getenv("TOKEN")
-            self.netloc = urlparse(OAUTH2_REDIRECT_URI).netloc
-            self.bot_id = int(base64.b64decode(self.bot_token.split(".")[0] + "=="))
+            self.netloc = urlparse(self.redirect_uri).netloc
+            self.bot_id = int(self.client_id)
 
 
 class LogviewerServer:
@@ -74,10 +79,9 @@ class LogviewerServer:
     Main class to handle the log viewer server.
     """
 
-    def __init__(self, bot: ModmailBot):
+    def __init__(self, bot: ModmailBot, config: dict):
         self.bot: ModmailBot = bot
-        self.config: Config = Config()
-
+        self.config: Config = Config(config=config)
         self.app: Application = MISSING
         self.site: web.TCPSite = MISSING
         self.runner: web.AppRunner = MISSING
@@ -103,7 +107,7 @@ class LogviewerServer:
 
         self._hooked = True
 
-        key = os.getenv("LOGVIEWER_SECRET", "A sophisticated key")[:24]
+        key = self.config.encryption_key
         key_b = key.encode("utf-8")
         key64 = base64.urlsafe_b64encode(key_b.ljust(32)[:32])
         secret_key = fernet.Fernet(key64)
@@ -137,9 +141,25 @@ class LogviewerServer:
         if not self._hooked:
             self.init_hook()
         logger.info("Starting log viewer server.")
-        self.runner = web.AppRunner(self.app, handle_signals=True)
+        self.runner = web.AppRunner(
+            self.app, handle_signals=True, access_log=logger, access_log_format="[%a] %r %s %b"
+        )
         await self.runner.setup()
-        self.site = web.TCPSite(self.runner, self.config.host, self.config.port)
+        ssl_keypair = [self.config.ssl_cert_path, self.config.ssl_key_path]
+        ssl_enabled = all(ssl_keypair)
+        if ssl_enabled:
+            try:
+                ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                ssl_context.load_cert_chain(ssl_keypair[0], ssl_keypair[1])
+                self.site = web.TCPSite(
+                    self.runner, self.config.host, self.config.port, ssl_context=ssl_context
+                )
+                self.is_https = True
+            except Exception as e:
+                logger.error(f"Failed to configure SSL, falling back to HTTP server\n{e}")
+        if not self.site:
+            self.site = web.TCPSite(self.runner, self.config.host, self.config.port)
+            self.is_https = False
         await self.site.start()
         self._running = True
 
@@ -316,7 +336,7 @@ class LogviewerServer:
         kwargs["user"] = session.get("user")
         kwargs["app"] = request.app
         kwargs["config"] = self.config
-        kwargs["using_oauth"] = oauth_enabled
+        kwargs["using_oauth"] = self.config.using_oauth
         kwargs["logged_in"] = kwargs["user"] is not None
         kwargs["favicon"] = self.bot.user.display_avatar.replace(size=32, format="webp")
 

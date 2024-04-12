@@ -5,11 +5,9 @@ import aiohttp
 from aiohttp_session import get_session, log as aiohttp_session_logger
 from core.models import getLogger
 
-logger = getLogger(__name__)
+from . import servers
 
-OAUTH2_CLIENT_ID = os.getenv("OAUTH2_CLIENT_ID")
-OAUTH2_CLIENT_SECRET = os.getenv("OAUTH2_CLIENT_SECRET")
-OAUTH2_REDIRECT_URI = os.getenv("OAUTH2_REDIRECT_URI")
+logger = getLogger(__name__)
 
 API_BASE = "https://discordapp.com/api/"
 AUTHORIZATION_BASE_URL = f"{API_BASE}/oauth2/authorize"
@@ -82,9 +80,9 @@ async def fetch_token(code):
     data = {
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": OAUTH2_REDIRECT_URI,
-        "client_id": OAUTH2_CLIENT_ID,
-        "client_secret": OAUTH2_CLIENT_SECRET,
+        "redirect_uri": servers.REDIRECT_URI,
+        "client_id": servers.CLIENT_ID,
+        "client_secret": servers.CLIENT_SECRET,
         "scope": "identify",
     }
 
@@ -101,9 +99,9 @@ async def login(request):
 
     data = {
         "scope": "identify",
-        "client_id": OAUTH2_CLIENT_ID,
+        "client_id": servers.CLIENT_ID,
         "response_type": "code",
-        "redirect_uri": OAUTH2_REDIRECT_URI,
+        "redirect_uri": servers.REDIRECT_URI,
     }
 
     raise aiohttp.web.HTTPFound(f"{AUTHORIZATION_BASE_URL}?{urlencode(data)}")
