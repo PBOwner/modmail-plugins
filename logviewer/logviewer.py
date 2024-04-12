@@ -148,6 +148,16 @@ class Logviewer(commands.Cog, name=__plugin_name__):
         await ctx.message.delete()
         await ctx.send("Logviewer encryption key set.")
 
+    @logviewer_config.command(name="port")
+    @checks.has_permissions(PermissionLevel.OWNER)
+    async def set_port(self, ctx: commands.Context, port: int):
+        """
+        Set the webserer port for Logviewer to listen on. Webserver must be restarted for this change to take effect.
+        """
+        self.config["port"] = port
+        await self.update_config()
+        await ctx.send("Logviewer port set.")
+
     @logviewer_config.group(name="remove", aliases=["reset", "delete"])
     @checks.has_permissions(PermissionLevel.OWNER)
     async def remove_config(self, ctx: commands.Context):
