@@ -30,7 +30,7 @@ Make sure to set `REGISTRY_PLUGINS_ONLY` in your environment variables to `False
  </thead>
  
  <tr>
-  <td><a href="https://github.com/raidensakura/modmail-plugins/tree/main/logviewer">logviewer</a></td>
+  <td><a href="https://github.com/raidensakura/modmail-plugins/tree/main/logviewer">Logviewer</a></td>
   <td>A modification of <a href="https://github.com/Jerrie-Aries/modmail-plugins/tree/master/logviewer">Jerrie-Aries' logviewer plugin</a> with OAuth support and a log list page.<br><br>To enable OAuth, make sure these variables exist in your environment:
   <ul>
   <li><code>OAUTH2_CLIENT_ID</code> - The ID of your bot</li>
@@ -38,6 +38,11 @@ Make sure to set `REGISTRY_PLUGINS_ONLY` in your environment variables to `False
   <li><code>OAUTH2_REDIRECT_URI</code> - This will be equal to the URL of your log viewer app + <code>/callback</code> e.g. <code>https://logwebsite.com/callback</code>. You will need to add this same URL as a redirect URL in the OAuth2 section in the Discord dev portal.<br></li>
   </ul>Lastly, add users or roles to whitelist to access the logs with <code>[p]oauth whitelist @user/role</code>
   </td>
+ </tr>
+
+ <tr>
+  <td><a href="https://github.com/raidensakura/modmail-plugins/tree/main/say">Say</a></td>
+  <td>A port of <a href="https://github.com/laggron42/Laggrons-Dumb-Cogs/tree/v3/say">El Laggron's say cog</a> for Red Discord bot with some incompatible features removed.</td>
  </tr>
 
   </tr>

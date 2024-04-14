@@ -1,0 +1,17 @@
+{
+    "author": [
+        "retke (El Laggron)",
+        "raidensakura"
+    ],
+    "bot_version": "4.1.0",
+    "description": "Speak as the bot through multiple options. Originally a Red Bot cog by El Laggron, ported to Modmail by raidensakura.",
+    "dpy_version": "2.3.2",
+    "name": "Say",
+    "requirements": [],
+    "tags": [
+        "rift",
+        "upload",
+        "interact"
+    ],
+    "version": "1.0.0"
+}
