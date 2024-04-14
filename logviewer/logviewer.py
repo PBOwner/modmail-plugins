@@ -55,6 +55,7 @@ class Logviewer(commands.Cog, name=__plugin_name__):
         if not self.config:
             self.config = self.default_config
         self.config["oauth2_client_id"] = self.bot.user.id
+        self.config["log_url"] = os.getenv("LOG_URL")
         log_url = os.getenv("LOG_URL", self.config["log_url"])
         if log_url:
             self.config["oauth2_redirect_uri"] = (
