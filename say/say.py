@@ -40,7 +40,7 @@ class Say(commands.Cog):
         if not channel:
             channel = ctx.channel
         if not text:
-            await ctx.send_help()
+            await ctx.send_help(ctx.command)
             return
 
         author = ctx.author
@@ -55,7 +55,6 @@ class Say(commands.Cog):
                 )
             else:
                 await author.send(("I am not allowed to send messages in ") + channel.mention)
-                # If this fails then fuck the command author
             return
 
         try:
@@ -176,18 +175,20 @@ class Say(commands.Cog):
         """
         Get informations about the cog.
         """
-        await ctx.send(
-            (
-                "Laggron's Dumb Cogs V3 - say\n\n"
-                "Version: {0.__version__}\n"
-                "Author: {0.__author__}\n"
-                "Github repository: https://github.com/retke/Laggrons-Dumb-Cogs/tree/v3\n"
-                "Discord server: https://discord.gg/GET4DVk\n"
-                "Documentation: http://laggrons-dumb-cogs.readthedocs.io/\n"
-                "Help translating the cog: https://crowdin.com/project/laggrons-dumb-cogs/\n\n"
-                "Support my work on Patreon: https://www.patreon.com/retke"
-            ).format(self)
+        e = discord.Embed(
+            color=ctx.bot.main_color,
+            title="Laggron's Dumb Cogs - say",
+            description="Originally made for Red Discord bot, ported to Modmail by raidensakura.",
         )
+        e.add_field(
+            name="Original Repository", value="https://github.com/retke/Laggrons-Dumb-Cogs/", inline=False
+        )
+        e.add_field(
+            name="Plugin Repository", value="https://github.com/raidensakura/modmail-plugins", inline=False
+        )
+        e.add_field(name="Version", value=f"{self.__version__}")
+        e.add_field(name="Author", value=f"{', '.join(self.__author__)}")
+        await ctx.send(embed=e)
 
     async def cog_unload(self):
         logger.debug("Unloading cog...")
