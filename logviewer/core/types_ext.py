@@ -29,6 +29,7 @@ class AttachmentPayload(TypedDict):
     url: str
     is_image: bool
     size: int
+    content_type: str
 
 
 class LogEntryPayload(TypedDict):

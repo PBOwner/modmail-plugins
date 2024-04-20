@@ -216,7 +216,7 @@ class LogviewerServer:
         document: RawPayload = await logs.find_one({"key": key})
         if not document:
             return await self.raise_error("not_found", message=f"Log entry '{key}' not found.")
-        log_entry = LogEntry(document)
+        log_entry = LogEntry(document, self.bot)
         return await self.render_template("logbase", request, log_entry=log_entry, **kwargs)
 
     @authentication

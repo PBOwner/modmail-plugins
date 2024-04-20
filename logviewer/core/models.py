@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+from time import time
 from typing import TYPE_CHECKING, List, Optional, Union
+from urllib.parse import parse_qs, urlparse
 
 import dateutil.parser
+from bot import ModmailBot
 from core.models import getLogger
+from discord import DMChannel
 from natural.date import duration
 
 from .formatter import format_content_html
@@ -19,9 +23,11 @@ if TYPE_CHECKING:
         MessagePayload,
     )
 
+cache = {"users": {}, "dm_channels": {}, "messages": {}}
+
 
 class LogEntry:
-    def __init__(self, data: LogEntryPayload):
+    def __init__(self, data: LogEntryPayload, bot: ModmailBot):
         self.key: str = data["key"]
         self.open: bool = data["open"]
 
@@ -42,7 +48,7 @@ class LogEntry:
         self.recipient: Author = Author(data["recipient"])
         self.closer: Author = Author(data["closer"]) if not self.open else None
         self.close_message: str = format_content_html(data.get("close_message") or "")
-        self.messages: List[Message] = [Message(m) for m in data["messages"]]
+        self.messages: List[Message] = [Message(m, bot) for m in data["messages"]]
         self.internal_messages: List[Message] = [m for m in self.messages if m.type == "internal"]
         self.thread_messages: List[Message] = [
             m for m in self.messages if m.type not in ("internal", "system")
@@ -217,21 +223,29 @@ class Attachment:
             self.url: str = data["url"]
             self.is_image: bool = data["is_image"]
             self.size: int = data["size"]
+            self.content_type: str = data["content_type"]
+
+    @property
+    def is_attachment_expired(self) -> bool:
+        parsed_url = urlparse(self.url)
+        query_params = parse_qs(parsed_url.query)
+        expiry = int(query_params.get("ex", [None])[0], 16)
+        current_time = time()
+        return current_time > expiry
 
 
 class Message:
-    def __init__(self, data: MessagePayload):
+    def __init__(self, data: MessagePayload, bot: ModmailBot = None):
         self.id: int = int(data["message_id"])
-
         self.created_at: datetime = dateutil.parser.parse(data["timestamp"])
         if self.created_at.tzinfo is not None:
             self.created_at = self.created_at.replace(tzinfo=None)
-
+        self.attachments: List[Attachment] = [Attachment(a) for a in data["attachments"]]
         self.human_created_at: str = duration(self.created_at, now=datetime.utcnow())
         self.raw_content: str = data["content"]
         self.content: str = self.format_html_content(self.raw_content)
-        self.attachments: List[Attachment] = [Attachment(a) for a in data["attachments"]]
         self.author: Author = Author(data["author"])
+        self.bot = bot
         self.type: str = data.get("type", "thread_message")
         self.edited: bool = data.get("edited", False)
 
@@ -241,6 +255,44 @@ class Message:
             or other.author != self.author
             or other.type != self.type
         )
+
+    async def refresh_attachment_url(self, attachments: Attachment):
+        if not self.bot or self.author.mod:
+            return attachments
+        user = cache["users"][self.author.id] if self.author.id in cache["users"] else None
+        dm_channel = cache["dm_channels"][self.author.id] if self.author.id in cache["dm_channels"] else None
+        discord_message = cache["messages"][self.id] if self.id in cache["messages"] else None
+        update_attachments, to_save = False, []
+        for i, attachment in enumerate(attachments):
+            if not attachment.is_attachment_expired:
+                continue
+            if not user:
+                user = self.bot.get_user(self.author.id) or await self.bot.fetch_user(self.author.id)
+                cache["users"][self.author.id] = user
+            if not dm_channel:
+                dm_channel: DMChannel = user.dm_channel or await user.create_dm()
+                cache["dm_channels"][self.author.id] = dm_channel
+            try:
+                if not discord_message:
+                    discord_message = await user.dm_channel.fetch_message(self.id)
+                    cache["messages"][self.id] = discord_message
+                attachment.url = discord_message.attachments[i].url
+                logger.debug(f"Refreshed Attachment#{i+1} for Message ID {self.id}")
+                if not update_attachments:
+                    update_attachments = True
+            except Exception:
+                logger.debug(f"Unable to find Message ID {self.id} in {user}'s DM")
+                continue
+            to_save.append(attachment.__dict__)
+        if update_attachments and self.bot:
+            await self.bot.db.logs.update_one(
+                {"messages.message_id": str(self.id)}, {"$set": {"messages.$.attachments": to_save}}
+            )
+        return attachments
+
+    @property
+    async def valid_attachments(self) -> List[Attachment]:
+        return await self.refresh_attachment_url(self.attachments)
 
     @staticmethod
     def format_html_content(content: str) -> str:

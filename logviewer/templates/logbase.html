@@ -105,7 +105,7 @@
                     </div>
 
                     {% endif %}
-                    {% for attachment in message.attachments %}
+					{% for attachment in message.valid_attachments %}
                     <div class="chatlog__attachment" id="{{ message.id }}">
                         <a href="{{ attachment.url }}">
                             {% if attachment.is_image %}
