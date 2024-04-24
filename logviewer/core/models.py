@@ -23,7 +23,7 @@ if TYPE_CHECKING:
         MessagePayload,
     )
 
-cache = {"users": {}, "dm_channels": {}, "messages": {}}
+cache = {"users": {}, "dm_channels": {}}
 
 
 class LogEntry:
@@ -261,7 +261,6 @@ class Message:
             return attachments
         user = cache["users"][self.author.id] if self.author.id in cache["users"] else None
         dm_channel = cache["dm_channels"][self.author.id] if self.author.id in cache["dm_channels"] else None
-        discord_message = cache["messages"][self.id] if self.id in cache["messages"] else None
         update_attachments, to_save = False, []
         for i, attachment in enumerate(attachments):
             if not attachment.is_attachment_expired:
@@ -273,9 +272,7 @@ class Message:
                 dm_channel: DMChannel = user.dm_channel or await user.create_dm()
                 cache["dm_channels"][self.author.id] = dm_channel
             try:
-                if not discord_message:
-                    discord_message = await user.dm_channel.fetch_message(self.id)
-                    cache["messages"][self.id] = discord_message
+                discord_message = await user.dm_channel.fetch_message(self.id)
                 attachment.url = discord_message.attachments[i].url
                 logger.debug(f"Refreshed Attachment#{i+1} for Message ID {self.id}")
                 if not update_attachments:
