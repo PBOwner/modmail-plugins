@@ -153,11 +153,21 @@ class Logviewer(commands.Cog, name=__plugin_name__):
     @checks.has_permissions(PermissionLevel.OWNER)
     async def set_port(self, ctx: commands.Context, port: int):
         """
-        Set the webserer port for Logviewer to listen on. Webserver must be restarted for this change to take effect.
+        Set the webserver port for Logviewer to listen on. Webserver must be restarted for this change to take effect.
         """
         self.config["port"] = port
         await self.update_config()
         await ctx.send("Logviewer port set.")
+
+    @logviewer_config.command(name="pagination")
+    @checks.has_permissions(PermissionLevel.OWNER)
+    async def set_pagination(self, ctx: commands.Context, pagination: int):
+        """
+        Set the number of logs to display per page. Webserver must be restarted for this change to take effect.
+        """
+        self.config["pagination"] = pagination
+        await self.update_config()
+        await ctx.send("Logviewer pagination set.")
 
     @logviewer_config.group(name="remove", aliases=["reset", "delete"])
     @checks.has_permissions(PermissionLevel.OWNER)
