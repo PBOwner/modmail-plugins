@@ -29,7 +29,8 @@ class AttachmentPayload(TypedDict):
     url: str
     is_image: bool
     size: int
-    content_type: str
+    # content_type only exist on our forks
+    content_type: Optional[str]
 
 
 class LogEntryPayload(TypedDict):

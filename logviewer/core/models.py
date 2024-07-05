@@ -223,7 +223,8 @@ class Attachment:
             self.url: str = data["url"]
             self.is_image: bool = data["is_image"]
             self.size: int = data["size"]
-            self.content_type: str = data["content_type"]
+            # content_type only exist on our forks
+            self.content_type: Optional[str] = data.get("content_type")
 
     @property
     def is_attachment_expired(self) -> bool:
