@@ -41,7 +41,7 @@ class Logviewer(commands.Cog, name=__plugin_name__):
             "oauth2_client_secret": None,
             "oauth2_redirect_uri": None,
             "host": "0.0.0.0",
-            "port": 3000,
+            "port": 1500,
             "log_url_prefix": "/logs",
             "pagination": 25,
             "ssl_cert_path": None,
