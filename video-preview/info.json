@@ -1,0 +1,15 @@
+{
+    "author": [
+        "raidensakura"
+    ],
+    "bot_version": "4.1.0",
+    "description": "Display uploaded video attachment inside thread channel. Bounty plugin requested by neya.",
+    "dpy_version": "2.3.2",
+    "name": "video-preview",
+    "requirements": [],
+    "tags": [
+       "video",
+	   "embed"
+    ],
+    "version": "1.0.0"
+}

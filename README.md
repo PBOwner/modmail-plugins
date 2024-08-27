@@ -45,7 +45,10 @@ Make sure to set `REGISTRY_PLUGINS_ONLY` in your environment variables to `False
   <td>A port of <a href="https://github.com/laggron42/Laggrons-Dumb-Cogs/tree/v3/say">El Laggron's say cog</a> for Red Discord bot with some incompatible features removed.</td>
  </tr>
 
-  </tr>
+ <tr>
+  <td><a href="https://github.com/raidensakura/modmail-plugins/tree/main/video-preview">Video Preview</a></td>
+  <td>Bounty plugin made for neya. It simply sends a link of a video attachment inside the thread channel so it can be played within the client.</td>
+ </tr>
  
 </table>
 
