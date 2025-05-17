@@ -60,7 +60,7 @@ class Config:
         self.redirect_uri = os.getenv("OAUTH2_REDIRECT_URI", config["oauth2_redirect_uri"])
         self.ssl_cert_path = os.getenv("SSL_CERT_PATH", config["ssl_cert_path"])
         self.ssl_key_path = os.getenv("SSL_KEY_PATH", config["ssl_key_path"])
-        self.encryption_key = os.getenv("LOGVIEWER_SECRET", config["encryption_key"])[:24]
+        self.encryption_key = os.getenv("LOGVIEWER_SECRET", config["encryption_key"])
 
         global REDIRECT_URI, CLIENT_ID, CLIENT_SECRET
         REDIRECT_URI, CLIENT_ID, CLIENT_SECRET = self.redirect_uri, self.client_id, self.client_secret
