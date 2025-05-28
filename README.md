@@ -52,14 +52,27 @@ Make sure to set `REGISTRY_PLUGINS_ONLY` in your environment variables to `False
  
 </table>
 
-<h2 align="center">Dev Stuff</h2>
+<h2 align="center">Contributing</h2>
+This project has included pre-commit script that can automatically run black and ruff linter on every commit.
 
-<h3 align="center">Formatting</h3>
-<p align="center">Make sure poetry is installed (I recommend using pipx).</p>
+1. Install development dependencies.
+   ```console
+   $ uv sync --dev
+   ```
+2. Run the pre-commit hook.
+   ```console
+   $ uv run pre-commit
+   ```
+3. Install the pre-commit hook (Optional).
+   ```console
+   $ uv run pre-commit install
+   ```
 
-```py
-poetry install --no-root --only dev
-pre-commit install
+Alternatively, you can also lint the codebase manually
+
+```console
+$ uv run black .
+$ uv run ruff format .
 ```
 
 <h2 align="center">Credits</h2>

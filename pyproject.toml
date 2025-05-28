@@ -1,22 +1,60 @@
-[tool.poetry]
+[project]
+requires-python = "<3.12,>=3.9"
 name = "modmail-plugins"
 version = "0.1.0"
 description = "Raiden's plugins for Python Discord Modmail bot"
-authors = ["Raiden Sakura <raiden@project-mei.xyz>"]
-license = "LICENSE"
+authors = [
+    { name = "Raiden Sakura", email = "raiden@project-mei.xyz" }
+]
+license = { file = "LICENSE" }
 readme = "README.md"
+dependencies = []
 
-[tool.poetry.dependencies]
-python = ">=3.9,<3.12"
+[dependency-groups]
+dev = [
+    "black==23.12.0",
+    "ruff==0.1.8",
+    "pre-commit==3.6.0"
+]
 
-[tool.poetry.group.dev.dependencies]
-black = "^23.12.0"
-ruff = "^0.1.8"
-pre-commit = "^3.6.0"
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff.lint]
+select = ["C90", "E", "F", "I001", "PGH004", "RUF100"]
+ignore = ["F405", "E741", "C901", "F403", "E501"]
+fixable = ["ALL"]
+mccabe.max-complexity = 25
+isort.combine-as-imports = true
+unfixable = []
 
 [tool.black]
 line-length = "110"
@@ -38,17 +76,3 @@ extend-exclude = '''
   )/
 )
 '''
-
-[tool.ruff]
-target-version = "py310"
-line-length = 110
-select = ["C90", "E", "F", "I001", "PGH004", "RUF100"]
-ignore = ["F405", "E741", "C901", "F403", "E501"]
-fix = true
-fixable = ["I001"]
-isort.combine-as-imports = true
-force-exclude = true
-
-[tool.ruff.mccabe]
-# Unlike Flake8, default to a complexity level of 10.
-max-complexity = 25
