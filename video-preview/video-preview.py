@@ -2,11 +2,9 @@
 
 import re
 from logging import getLogger
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import discord
 from bot import ModmailBot
-from core import checks
 from core.thread import Thread
 from discord.ext import commands
 
