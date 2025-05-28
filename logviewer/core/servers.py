@@ -51,16 +51,18 @@ class Config:
 
     def __init__(self, config: dict):
         self.log_url = os.getenv("LOG_URL", "http://localhost:8000")
-        self.log_prefix = os.getenv("LOG_URL_PREFIX", config["log_url_prefix"])
-        self.host = os.getenv("HOST", config["host"])
-        self.port = int(os.getenv("PORT", config["port"]))
-        self.pagination = os.getenv("LOGVIEWER_PAGINATION", config["pagination"])
-        self.client_id = os.getenv("OAUTH2_CLIENT_ID", config["oauth2_client_id"])
-        self.client_secret = os.getenv("OAUTH2_CLIENT_SECRET", config["oauth2_client_secret"])
-        self.redirect_uri = os.getenv("OAUTH2_REDIRECT_URI", config["oauth2_redirect_uri"])
-        self.ssl_cert_path = os.getenv("SSL_CERT_PATH", config["ssl_cert_path"])
-        self.ssl_key_path = os.getenv("SSL_KEY_PATH", config["ssl_key_path"])
-        self.encryption_key = os.getenv("LOGVIEWER_SECRET", config["encryption_key"])
+        self.log_prefix = os.getenv("LOG_URL_PREFIX") or config.get("log_url_prefix") or "/logs"
+        self.host = os.getenv("HOST") or config.get("host") or "127.0.0.1"
+        self.port = int(os.getenv("PORT") or config.get("port") or 8000)
+        self.pagination = os.getenv("LOGVIEWER_PAGINATION") or config.get("pagination") or 25
+        self.client_id = os.getenv("OAUTH2_CLIENT_ID") or config.get("oauth2_client_id") or ""
+        self.client_secret = os.getenv("OAUTH2_CLIENT_SECRET") or config.get("oauth2_client_secret") or ""
+        self.redirect_uri = os.getenv("OAUTH2_REDIRECT_URI") or config.get("oauth2_redirect_uri") or ""
+        self.ssl_cert_path = os.getenv("SSL_CERT_PATH") or config.get("ssl_cert_path") or ""
+        self.ssl_key_path = os.getenv("SSL_KEY_PATH") or config.get("ssl_key_path") or ""
+        self.encryption_key = (
+            os.getenv("LOGVIEWER_SECRET") or config.get("encryption_key") or "A very sophisticated key"
+        )
 
         global REDIRECT_URI, CLIENT_ID, CLIENT_SECRET
         REDIRECT_URI, CLIENT_ID, CLIENT_SECRET = self.redirect_uri, self.client_id, self.client_secret
