@@ -1,5 +1,3 @@
-# Say by retke, aka El Laggron
-
 import re
 from logging import getLogger
 
