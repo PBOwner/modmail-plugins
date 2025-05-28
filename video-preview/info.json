@@ -8,8 +8,8 @@
     "name": "video-preview",
     "requirements": [],
     "tags": [
-       "video",
-	   "embed"
+        "video",
+        "embed"
     ],
     "version": "1.0.0"
 }
