@@ -1,0 +1,26 @@
+name: Lint python
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  code-style:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+    name: Python ${{ matrix.python-version }} on ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run black linter
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./"
+
+      - name: Run ruff linter
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "latest"
