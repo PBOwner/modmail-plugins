@@ -2,7 +2,7 @@
 
 import re
 from logging import getLogger
-from typing import Any, Dict, List, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import discord
 from bot import ModmailBot
@@ -33,16 +33,17 @@ class VideoPreview(commands.Cog):
             await self.stop_interaction(user)
 
     @commands.Cog.listener()
-    async def on_thread_reply(self, thread: Thread, from_mod: bool, message: discord.Message, anon: bool, plain: bool) -> None:
-            
+    async def on_thread_reply(
+        self, thread: Thread, from_mod: bool, message: discord.Message, anon: bool, plain: bool
+    ) -> None:
         if not message.attachments:
             return
-        
+
         msg = ""
         for i, attachment in enumerate(message.attachments):
-            if attachment.filename.endswith(('.mp4', '.mov', '.avi', '.mkv', '.webm')):
+            if attachment.filename.endswith((".mp4", ".mov", ".avi", ".mkv", ".webm")):
                 msg += f"Video Preview ({i+1})\n{attachment.url}\n"
-                
+
         if from_mod:
             await thread.recipient.send(msg)
         else:
