@@ -238,7 +238,7 @@ class Logviewer(commands.Cog, name=__plugin_name__):
     @checks.has_permissions(PermissionLevel.OWNER)
     async def lv_stop(self, ctx: commands.Context):
         """
-        Stops the log viewer.
+        Stops the log viewer server.
         """
         if not self.server:
             raise commands.BadArgument("Logviewer server is not running.")
@@ -247,6 +247,23 @@ class Logviewer(commands.Cog, name=__plugin_name__):
             title="Stop",
             color=self.bot.main_color,
             description="Logviewer server is now stopped.",
+        )
+        await ctx.send(embed=embed)
+
+    @logviewer.command(name="restart")
+    @checks.has_permissions(PermissionLevel.OWNER)
+    async def lv_restart(self, ctx: commands.Context):
+        """
+        Restarts the log viewer server.
+        """
+        if self.server:
+            await self._stop_server()
+        self.server = LogviewerServer(self.bot, config=self.config)
+        await self.server.start()
+        embed = discord.Embed(
+            title="Restart",
+            color=self.bot.main_color,
+            description="Logviewer server has been restarted.",
         )
         await ctx.send(embed=embed)
 
